@@ -4,7 +4,7 @@ try:
 except:
     pass # Heroku does not use .env
 import json
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from config import Config
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -19,7 +19,13 @@ from schemas import products_schema, product_schema
 
 @app.route('/')
 def hello():
-    return "Hello World!"
+    products = db.session.query(Product).all()
+    return render_template('home.html', products=products)
+
+@app.route('/products/<int:id>')
+def show_product(id):
+    product = db.session.query(Product).get(id)
+    return render_template('product.html', product=product)
 
 @app.route('/api/v1/products')
 def products():
